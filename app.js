@@ -229,7 +229,7 @@ const $ = s => document.querySelector(s);
 const app = $('#app');
 function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2600); }
 function vibrate(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} }
-function addXP(n, why) { S.xp += n; save(); if (why) toast('+' + n + ' XP · ' + why); }
+function addXP(n, why) { S.xp += n; save(); if (why) toast('+' + n + ' pontos · ' + why); }
 function award(id) { if (S.badges[id]) return; S.badges[id] = Date.now(); save(); const b = BADGES.find(x => x.id === id); if (b) setTimeout(() => toast(b.e + ' Conquista: ' + b.t), 900); }
 function modal(html, onclose) {
   const m = document.createElement('div'); m.className = 'modal'; m.innerHTML = '<div class="sheet">' + html + '</div>';
@@ -275,7 +275,7 @@ document.addEventListener('input', e => { const f = e.target.closest('[data-fiel
 function topbar(back) {
   return '<header class="topbar">' + (back ? '<button class="btn-ghost btn" style="padding:8px 12px" data-go="' + back + '">←</button>' : '') +
     '<span class="logo-sl" role="img" aria-label="Smart Líder"></span><span class="chip-ia">IA</span><span class="sp"></span>' +
-    '<span class="pill fire" title="Dias seguidos">🔥 ' + S.streak + '</span><span class="pill xp" title="Pontos de experiência">⚡ ' + S.xp + '</span></header>';
+    '<button class="pill fire" data-act="ptsInfo" title="Dias seguidos">🔥 ' + S.streak + '</button><button class="pill xp" data-act="ptsInfo" title="Seus pontos">⚡ ' + S.xp + '</button></header>';
 }
 function render() {
   const nav = $('#nav');
@@ -322,7 +322,7 @@ function viewHome() {
   return topbar() + '<main class="view stack">' +
     '<section class="card dark"><div class="hello"><div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="9"/><circle cx="50" cy="50" r="42" fill="none" stroke="url(#gg)" stroke-width="9" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + C * (1 - pct) + '" style="transition:stroke-dashoffset 1s"/><defs><linearGradient id="gg"><stop offset="0" stop-color="#FFC53D"/><stop offset="1" stop-color="#F79300"/></linearGradient></defs></svg><div class="v"><div>' + dc + '/7<small>dias</small></div></div></div>' +
     '<div><div class="muted small">' + hi + ',</div><h2>' + esc(firstName()) + '</h2><div class="small" style="color:#FFC53D;font-weight:700;margin-top:2px">' + lv.name + '</div></div></div>' +
-    '<div class="level"><div class="row between small muted" style="margin-bottom:6px"><span>⚡ ' + S.xp + ' XP</span><span>' + (lv.next ? 'Próximo: ' + lv.next + ' (' + lv.to + ')' : 'Nível máximo') + '</span></div><div class="bar"><i style="width:' + lvPct + '%"></i></div></div></section>' +
+    '<div class="level"><div class="row between small muted" style="margin-bottom:6px"><span>⚡ ' + S.xp + ' pontos</span><span>' + (lv.next ? 'Próximo: ' + lv.next + ' (' + lv.to + ')' : 'Nível máximo') + '</span></div><div class="bar"><i style="width:' + lvPct + '%"></i></div></div></section>' +
     todayCard +
     (doneCount() < 2 ? '<button class="card row" style="width:100%;text-align:left" data-go="guide"><span style="font-size:28px">📖</span><div><b>Como o app funciona</b><div class="small muted">Exemplos, simulações e o que fazer em cada dia</div></div><span style="margin-left:auto">→</span></button>' : '') +
     '<div class="card"><div class="row between"><h3>Sua semana</h3><span class="small muted">' + (S.streak ? '🔥 ' + S.streak + ' dia' + (S.streak > 1 ? 's' : '') + ' seguido' + (S.streak > 1 ? 's' : '') : '1 microação por dia') + '</span></div>' + week + '</div>' +
@@ -387,7 +387,7 @@ function viewDay() {
     body = '<div class="eyebrow">Autoavaliação</div><h2 style="margin:6px 0 4px">Como você se vê hoje em ' + st.verb + '?</h2><p class="muted small">De 1 (quase nunca) a 5 (quase sempre). É isso que desenha o seu formato.</p>' +
       d.likert.map((q, i) => '<div class="likert"><div class="q">' + q + '</div><div class="scale">' + [1, 2, 3, 4, 5].map(v => '<button class="' + (lk[i] === v ? 'on' : '') + '" data-act="likert" data-i="' + i + '" data-v="' + v + '">' + v + '</button>').join('') + '</div><div class="scale-l"><span>Quase nunca</span><span>Quase sempre</span></div></div>').join('');
     canNext = d.likert.every((_, i) => lk[i]); }
-  if (cur === 'note') { body = '<div class="eyebrow">Registro do dia</div><h2 style="margin:6px 0 10px">' + d.note + '</h2><textarea data-field="note" placeholder="Escreva em poucas linhas. Só você vê isso.">' + esc(s.note || '') + '</textarea><p class="small muted" style="margin-top:8px">✍️ Registrar dobra a fixação do aprendizado (+20 XP).</p>'; nextLabel = 'Concluir o dia ' + n + ' ✓'; }
+  if (cur === 'note') { body = '<div class="eyebrow">Registro do dia</div><h2 style="margin:6px 0 10px">' + d.note + '</h2><textarea data-field="note" placeholder="Escreva em poucas linhas. Só você vê isso.">' + esc(s.note || '') + '</textarea><p class="small muted" style="margin-top:8px">✍️ Registrar dobra a fixação do aprendizado (+20 pontos).</p>'; nextLabel = 'Concluir o dia ' + n + ' ✓'; }
   if (cur === 'test') { const pa = s.pa || []; const i = Math.min(s.paI || 0, PA.length - 1);
     body = '<div class="eyebrow">Poder x Autoridade · ' + (i + 1) + ' de ' + PA.length + '</div><div class="bar light" style="margin:10px 0 18px"><i style="width:' + (pa.filter(x => x != null).length / PA.length * 100) + '%"></i></div><h2 style="margin-bottom:14px">O que você realmente faz?</h2>' +
       PA[i].map((t, j) => { const k = (i % 2) ? 1 - j : j; return '<button class="opt ' + (pa[i] === k ? 'on' : '') + '" data-act="paPick" data-k="' + k + '"><b>' + 'AB'[j] + '</b>' + PA[i][k] + '</button>'; }).join('') +
@@ -436,7 +436,7 @@ function afterComplete(n, xp) {
   if (n === 7) { go('profile', { reveal: true }); confetti(); return; }
   confetti();
   const nx = n + 1, d = DAYS[nx];
-  modal('<div class="celebrate"><div class="big">' + (n === 5 ? '⚖️' : n === 6 ? '🧠' : '🎉') + '</div><h2 style="margin:10px 0 4px">Dia ' + n + ' concluído!</h2>' + (xp ? '<div class="xpfly">+' + xp + ' XP</div>' : '') +
+  modal('<div class="celebrate"><div class="big">' + (n === 5 ? '⚖️' : n === 6 ? '🧠' : '🎉') + '</div><h2 style="margin:10px 0 4px">Dia ' + n + ' concluído!</h2>' + (xp ? '<div class="xpfly">+' + xp + ' pontos</div>' : '') +
     '<p class="muted" style="margin-top:8px">' + (S.streak > 1 ? '🔥 ' + S.streak + ' dias seguidos. ' : '') + doneCount() + ' de 7 dias feitos.</p>' +
     (d ? '<div class="card" style="margin-top:16px;text-align:left"><div class="small muted">Amanhã · Dia ' + nx + '</div><b>' + d.title + '</b><div class="small muted">' + d.sub + '</div></div>' : '') +
     '<button class="btn btn-gold btn-block" style="margin-top:16px" data-close>Ir para o início</button>' + (d ? '<button class="btn btn-ghost btn-block" style="margin-top:8px" data-close data-go="day" data-n="' + nx + '">Quero fazer o dia ' + nx + ' agora</button>' : '') + '</div>', () => { if (route.v === 'day') go('home'); });
@@ -561,6 +561,11 @@ function inviteText() { return 'Oi! Estou fazendo o Desafio Smart Líder IA e le
 function openWA(t) { window.open('https://wa.me/?text=' + encodeURIComponent(t), '_blank', 'noopener'); }
 
 /* ---------- guia: como usar o app ---------- */
+function ptsTable() {
+  const row = (a, b) => '<div class="row between" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>' + a + '</span><b style="color:var(--royal)">' + b + '</b></div>';
+  return '<div style="margin-top:12px">' + row('Fazer o diagnóstico', '+50') + row('Concluir um dia', '+100') + row('Cada item do checklist', '+10') + row('Registrar o dia (2 linhas ou mais)', '+20') + row('Responder as 3 perguntas do dia 6', '+30') + '</div>' +
+    '<h3 style="margin-top:16px">Para que servem</h3><ul style="margin:8px 0 0 18px;line-height:1.7" class="muted"><li><b>Mostram o seu nível de líder</b>: Chefe em transição (0) → Líder em formação (200) → Líder consciente (450) → Smart Líder (750).</li><li><b>Premiam a prática real</b>, e não só a leitura: quem cumpre o checklist e registra o dia sobe mais rápido.</li><li><b>A 🔥 sequência</b> conta quantos dias seguidos você concluiu. Constância é o que transforma ação em hábito.</li></ul><p class="small muted" style="margin-top:10px">Os pontos são só seus e ficam no seu aparelho. Eles não alteram o seu perfil de liderança, que é desenhado pelas suas autoavaliações.</p>';
+}
 let sim = { int: 60, com: 45, rel: 82, imp: 38, pa: 6 };
 function viewGuide() {
   const step = (n, t, d) => '<div class="row" style="align-items:flex-start;margin-top:14px"><div class="jnum" style="width:38px;height:38px;font-size:18px">' + n + '</div><div><b>' + t + '</b><div class="muted small" style="margin-top:2px">' + d + '</div></div></div>';
@@ -584,6 +589,7 @@ function viewGuide() {
       step(3, 'No fim do dia, 5 minutos: marque o checklist e se avalie', 'Notas de 1 a 5 em 4 frases. São elas que desenham o seu formato.') +
       step(4, 'Registre em 2 linhas o que aconteceu', 'Escrever fixa o aprendizado e vale +20 pontos.') +
       '<p class="small muted" style="margin-top:14px">💡 Você pode sair a qualquer momento: o app guarda o ponto onde você parou. Cada dia concluído libera o próximo.</p></div>' +
+    '<div class="card"><h3>⚡ Pontos, níveis e sequência</h3><p class="muted small" style="margin-top:4px">Os números no topo da tela (⚡ e 🔥) <b>não são créditos</b> e não custam nada. São pontos que você ganha praticando.</p>' + ptsTable() + '<p class="small" style="margin-top:10px"><b>Exemplo:</b> a Carla fez o diagnóstico (+50) e o dia 1 completo: 100 + 3 itens do checklist (30) + registro (20). Ela terminou o primeiro dia com 200 pontos e já virou <b>Líder em formação</b>.</p></div>' +
     '<div class="card"><h3>🎮 Simulação: como o seu formato se desenha</h3><p class="muted small" style="margin-top:4px">Mexa nos controles para ver como cada estilo muda a forma. No desafio, quem mexe nesses controles são as suas notas dos dias 1 a 4, não um palpite.</p><div id="simRadar" style="margin-top:8px"></div>' +
       KEYS.map(k => '<div style="margin-top:10px"><div class="row between small"><b style="color:' + STY[k].color + '">' + STY[k].short + ' · ' + STY[k].verb + '</b><span id="simv-' + k + '">' + sim[k] + '%</span></div><input type="range" min="10" max="100" value="' + sim[k] + '" data-field="sim" data-k="' + k + '" style="width:100%;accent-color:' + STY[k].color + '"></div>').join('') +
       '<div id="simText" class="card action" style="margin-top:14px"></div></div>' +
@@ -673,7 +679,7 @@ const ACT = {
     if (cur === 'reveal') { completeDay(7); return; }
     s.step = Math.min(dayStep + 1, steps.length - 1); save(); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); },
   dayPrev() { const s = D(route.n); s.step = Math.max(0, dayStep - 1); save(); render(); window.scrollTo({ top: 0 }); },
-  check(el) { const s = D(route.n); s.checks = s.checks || [false, false, false]; const i = +el.dataset.i; s.checks[i] = !s.checks[i]; save(); vibrate(12); el.classList.toggle('on'); if (s.checks[i]) toast('+10 XP ao concluir o dia'); const b = $('[data-act="dayNext"]'); if (b) b.textContent = s.checks.filter(Boolean).length ? 'Fazer minha autoavaliação →' : 'Já apliquei, quero avaliar →'; },
+  check(el) { const s = D(route.n); s.checks = s.checks || [false, false, false]; const i = +el.dataset.i; s.checks[i] = !s.checks[i]; save(); vibrate(12); el.classList.toggle('on'); if (s.checks[i]) toast('+10 pontos ao concluir o dia'); const b = $('[data-act="dayNext"]'); if (b) b.textContent = s.checks.filter(Boolean).length ? 'Fazer minha autoavaliação →' : 'Já apliquei, quero avaliar →'; },
   likert(el) { const s = D(route.n); s.likert = s.likert || []; s.likert[+el.dataset.i] = +el.dataset.v; save(); vibrate(8); el.parentNode.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === el)); const d = DAYS[route.n]; const b = $('[data-act="dayNext"]'); if (b) b.disabled = !d.likert.every((_, i) => s.likert[i]); },
   paPick(el) { const s = D(5); s.pa = s.pa || Array(PA.length).fill(null); const i = Math.min(s.paI || 0, PA.length - 1); s.pa[i] = +el.dataset.k; vibrate(10); el.classList.add('on');
     setTimeout(() => { if (i < PA.length - 1) s.paI = i + 1; save(); if (s.pa.filter(x => x != null).length === PA.length && i === PA.length - 1) { s.step = 2; save(); } render(); }, 220); },
@@ -682,6 +688,7 @@ const ACT = {
   beliefPick(el) { const s = D(6); s.pick = +el.dataset.i; save(); render(); },
   useSuggest() { const s = D(6); s.r3 = BELIEFS[s.pick].n; save(); render(); },
   planPick(el) { const s = D(7); s.plan = s.plan || []; const t = el.dataset.t; const k = s.plan.indexOf(t); if (k >= 0) s.plan.splice(k, 1); else { if (s.plan.length >= 3) return toast('Escolha no máximo 3'); s.plan.push(t); } save(); vibrate(10); render(); },
+  ptsInfo() { modal('<h2>⚡ Seus pontos e 🔥 sequência</h2><p class="muted" style="margin-top:8px">Os pontos medem a sua <b>prática</b> no desafio. Não são créditos e não custam nada: você ganha fazendo.</p>' + ptsTable() + '<button class="btn btn-gold btn-block" style="margin-top:16px" data-close>Entendi</button><button class="btn btn-ghost btn-block" style="margin-top:8px" data-close data-go="guide">Ver o guia completo</button>'); },
   copyPost(el) { copy(posts()[+el.dataset.i].text); award('card'); },
   waPost(el) { openWA(posts()[+el.dataset.i].text); award('card'); },
   liPost(el) { copy(posts()[+el.dataset.i].text); award('card'); toast('Texto copiado. Cole no LinkedIn ✅'); setTimeout(() => window.open('https://www.linkedin.com/feed/?shareActive=true', '_blank', 'noopener'), 400); },
@@ -728,6 +735,7 @@ const FIELD = {
 
 /* ---------- início ---------- */
 (function boot() {
+  if (inFrame) document.documentElement.classList.add('embed');
   if (S.team) { S.team = null; S.mode = 'solo'; save(); }
   const h = (location.hash || '').slice(1); const m = h.match(/^(home|journey|profile|share|guide|more|ebook|prompt)$/); if (m) route = { v: m[1] };
   render();
