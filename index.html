@@ -241,7 +241,12 @@ label.f{display:block;font-weight:600;margin:14px 0 6px}
 .embed .nav button svg{width:20px;height:20px}
 .embed #app{padding-top:54px;padding-bottom:40px}
 .embed .topbar{top:54px}
-.embed .toast{bottom:40px}
+.embed .toast{bottom:auto;top:130px;transform:translate(-50%,-10px)}
+.embed .toast.on{transform:translate(-50%,0)}
+.embed #app{padding-bottom:140px}
+/* dentro da MemberApp a barra dela cobre o rodapé: janelas abrem no topo */
+.embed .modal{align-items:flex-start;padding-top:64px}
+.embed .modal .sheet{border-radius:0 0 24px 24px;max-height:calc(100vh - 200px);padding-bottom:22px}
 @media(max-width:420px){.embed .nav button{flex-direction:column;gap:2px;font-size:10.5px}.embed #app{padding-top:62px}.embed .topbar{top:62px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
