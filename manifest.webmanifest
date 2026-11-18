@@ -3,7 +3,7 @@
   "short_name": "Smart Líder",
   "description": "Descubra seu tipo de líder e saia do modo chefe em 7 dias, com 1 microação por dia.",
   "lang": "pt-BR",
-  "start_url": "./",
+  "start_url": "index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
