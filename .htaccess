@@ -1,0 +1,13 @@
+# App Smart Líder: sempre buscar a versão mais nova do app (sem cache longo)
+DirectoryIndex index.html
+<IfModule mod_expires.c>
+  <FilesMatch "\.(html|js|webmanifest)$">
+    ExpiresActive Off
+  </FilesMatch>
+</IfModule>
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|js|webmanifest)$">
+    Header unset Expires
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>

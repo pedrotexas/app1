@@ -651,7 +651,7 @@ function viewMore() {
     it('✉️', 'Suporte', 'data-act="support"', SUPPORT) +
     it('🔄', 'Recomeçar do zero', 'data-act="reset"', 'Apaga o progresso deste aparelho') +
     '</div><div class="card coach"><div class="ph"></div><div><div class="eyebrow">Quem conduz</div><b>Pedro Berto</b><div class="small muted">Forma líderes e equipes de vendas há mais de 25 anos. Especialista em PNL e fundador da Texas Treinamentos.</div></div></div>' +
-    '<p class="small muted" style="text-align:center">Smart Líder IA · Texas Treinamentos<br>Seu progresso fica salvo neste aparelho.</p></main>';
+    '<p class="small muted" style="text-align:center">Smart Líder IA · Texas Treinamentos · versão 1.10<br>Seu progresso fica salvo neste aparelho.</p></main>';
 }
 function viewEbook() {
   const ch = route.n;
