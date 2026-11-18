@@ -1,0 +1,17 @@
+{
+  "name": "Smart Líder IA · Desafio 7 dias",
+  "short_name": "Smart Líder",
+  "description": "Descubra seu tipo de líder e saia do modo chefe em 7 dias, com 1 microação por dia.",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#061233",
+  "theme_color": "#061233",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
