@@ -395,7 +395,7 @@ function viewDay() {
     body = '<div class="eyebrow">Autoavaliação</div><h2 style="margin:6px 0 4px">Como você se vê hoje em ' + st.verb + '?</h2><p class="muted small">De 1 (quase nunca) a 5 (quase sempre). É isso que desenha o seu formato.</p>' +
       d.likert.map((q, i) => '<div class="likert"><div class="q">' + q + '</div><div class="scale">' + [1, 2, 3, 4, 5].map(v => '<button class="' + (lk[i] === v ? 'on' : '') + '" data-act="likert" data-i="' + i + '" data-v="' + v + '">' + v + '</button>').join('') + '</div><div class="scale-l"><span>Quase nunca</span><span>Quase sempre</span></div></div>').join('');
     canNext = d.likert.every((_, i) => lk[i]); }
-  if (cur === 'note') { body = '<div class="eyebrow">Registro do dia</div><h2 style="margin:6px 0 10px">' + d.note + '</h2><textarea data-field="note" placeholder="Escreva em poucas linhas. Só você vê isso.">' + esc(s.note || '') + '</textarea><p class="small muted" style="margin-top:8px">✍️ Registrar dobra a fixação do aprendizado (+20 XP).</p>' + aiBlock(n); nextLabel = 'Concluir o dia ' + n + ' ✓'; }
+  if (cur === 'note') { body = '<div class="eyebrow">Registro do dia</div><h2 style="margin:6px 0 10px">' + d.note + '</h2><textarea data-field="note" placeholder="Escreva em poucas linhas. Só você vê isso.">' + esc(s.note || '') + '</textarea><p class="small muted" style="margin-top:8px">✍️ Registrar dobra a fixação do aprendizado (+20 XP).</p>'; nextLabel = 'Concluir o dia ' + n + ' ✓'; }
   if (cur === 'test') { const pa = s.pa || []; const i = Math.min(s.paI || 0, PA.length - 1);
     body = '<div class="eyebrow">Poder x Autoridade · ' + (i + 1) + ' de ' + PA.length + '</div><div class="bar light" style="margin:10px 0 18px"><i style="width:' + (pa.filter(x => x != null).length / PA.length * 100) + '%"></i></div><h2 style="margin-bottom:14px">O que você realmente faz?</h2>' +
       PA[i].map((t, j) => { const k = (i % 2) ? 1 - j : j; return '<button class="opt ' + (pa[i] === k ? 'on' : '') + '" data-act="paPick" data-k="' + k + '"><b>' + 'AB'[j] + '</b>' + PA[i][k] + '</button>'; }).join('') +
@@ -403,7 +403,7 @@ function viewDay() {
     canNext = pa.filter(x => x != null).length === PA.length; nextLabel = 'Ver meu resultado →'; }
   if (cur === 'result') { const v = paScore() || 0, z = paZone(v);
     body = '<div class="card dark" style="text-align:center"><div class="eyebrow">Seu resultado</div><h1 style="margin:8px 0">' + z[0] + '</h1><div class="gauge"><i id="gi" style="left:0%"></i></div><div class="row between small muted"><span>Poder</span><span>Autoridade</span></div><div style="font:800 46px var(--font-d);color:#FFC53D;margin-top:10px">' + v + '%</div><div class="muted small">das suas respostas vêm da autoridade</div></div><div class="card" style="margin-top:14px"><p>' + z[1] + '</p></div>' +
-      '<div class="card" style="margin-top:14px"><h3>Onde o poder ainda aparece</h3><ul style="margin:8px 0 0 18px" class="muted">' + PA.map((p, i) => (s.pa || [])[i] === 0 ? '<li>' + p[0] + '</li>' : '').join('') + '</ul>' + ((s.pa || []).every(x => x === 1) ? '<p class="muted">Em nenhuma das situações. Excelente!</p>' : '') + '</div>' + aiBlock(5);
+      '<div class="card" style="margin-top:14px"><h3>Onde o poder ainda aparece</h3><ul style="margin:8px 0 0 18px" class="muted">' + PA.map((p, i) => (s.pa || [])[i] === 0 ? '<li>' + p[0] + '</li>' : '').join('') + '</ul>' + ((s.pa || []).every(x => x === 1) ? '<p class="muted">Em nenhuma das situações. Excelente!</p>' : '') + '</div>';
     nextLabel = 'Concluir o dia 5 ✓';
     setTimeout(() => { const g = $('#gi'); if (g) g.style.left = v + '%'; }, 120); }
   if (cur === 'beliefs') { const bs = s.beliefs || [];
@@ -415,7 +415,7 @@ function viewDay() {
       '<label class="f">1. Que evidência você já viu de que isso nem sempre é verdade?</label><textarea data-field="r1" style="min-height:80px">' + esc(s.r1 || '') + '</textarea>' +
       '<label class="f">2. O que essa crença está custando para você e para o time?</label><textarea data-field="r2" style="min-height:80px">' + esc(s.r2 || '') + '</textarea>' +
       '<label class="f">3. Qual crença nova te serve melhor a partir de hoje?</label><textarea data-field="r3" style="min-height:80px" placeholder="Sugestão: ' + esc(b.n) + '">' + esc(s.r3 || '') + '</textarea>' +
-      '<button class="link small" style="margin-top:8px" data-act="useSuggest">Usar a sugestão</button>' + aiBlock(6);
+      '<button class="link small" style="margin-top:8px" data-act="useSuggest">Usar a sugestão</button>';
     canNext = (s.r3 || '').trim().length > 3; nextLabel = 'Concluir o dia 6 ✓'; }
   if (cur === 'diary') { body = '<div class="eyebrow">Diário de Liderança com IA</div><h2 style="margin:6px 0 8px">Seu prompt já está pronto</h2><p class="muted">Ele foi montado com os seus resultados da semana. Copie e cole no seu assistente de IA favorito. Responda às perguntas que ele fizer: esse é o seu diário.</p><div class="prompt" style="margin-top:14px">' + esc(buildPrompt()) + '</div>' +
       '<div class="grid2" style="margin-top:12px"><button class="btn btn-blue" data-act="copyPrompt">📋 Copiar prompt</button><button class="btn btn-ghost" data-act="openAI" data-u="https://chatgpt.com/">Abrir ChatGPT</button><button class="btn btn-ghost" data-act="openAI" data-u="https://gemini.google.com/app">Abrir Gemini</button><button class="btn btn-ghost" data-act="openAI" data-u="https://claude.ai/new">Abrir Claude</button></div>' +
@@ -592,7 +592,7 @@ function viewMore() {
   const it = (e, t, act, extra) => '<button ' + act + '><span class="e">' + e + '</span><span>' + t + (extra ? '<div class="small muted" style="font-weight:500">' + extra + '</div>' : '') + '</span><span class="chev">›</span></button>';
   return topbar() + '<main class="view stack"><div class="card mlist">' +
     it('📘', 'E-book do desafio', 'data-go="ebook"', 'Leia todos os capítulos no app') +
-    it('🤖', 'Prompt de IA do diário', 'data-go="prompt"', 'Pronto para ChatGPT, Gemini ou Claude') +
+    it('🤖', 'Prompt de IA do diário', 'data-go="prompt"', isDone(7) ? 'Pronto para ChatGPT, Gemini ou Claude' : 'Liberado no dia 7') +
     it('🧭', 'Refazer o diagnóstico', 'data-act="startDiag"', 'Veja se o seu estilo de partida mudou') +
     it('📅', 'Lembrete diário na agenda', 'data-act="icsDaily"', 'Um aviso por dia durante o desafio') +
     it('📲', 'Instalar o app', 'data-act="install"', standalone ? 'Já instalado neste aparelho' : 'Celular ou computador') +
@@ -613,10 +613,9 @@ function viewEbook() {
     '<div style="margin-top:16px">' + [1, 2, 3, 4, 5, 6, 7].map(i => '<button class="jitem" data-go="ebook" data-n="' + i + '"><div class="jnum">' + i + '</div><div><div class="t">' + DAYS[i].title + '</div><div class="s">' + DAYS[i].sub + '</div></div><span class="r">›</span></button>').join('') + '</div></main>';
 }
 function viewPrompt() {
-  let last = 0; for (let i = 7; i >= 1; i--) if (isDone(i) || (S.days[i] && S.days[i].step)) { last = i; break; }
-  const n = last && last < 7 ? last : 0;
-  return topbar('more') + '<main class="view stack"><div><div class="eyebrow">Prompt de IA pronto</div><h1 style="margin:6px 0 8px">Seu Diário de Liderança</h1><p class="muted">Use todos os dias, em 5 minutos. ' + (n ? 'Este é o prompt do <b>dia ' + n + '</b>, preenchido com o que você registrou.' : 'O prompt já usa os seus resultados.') + ' Não precisa entender de IA: copie, cole e responda.</p></div><div class="prompt">' + esc(n ? buildDayPrompt(n) : buildPrompt()) + '</div>' +
-    '<div class="grid2"><button class="btn btn-blue" data-act="copyPrompt"' + (n ? ' data-n="' + n + '"' : '') + '>📋 Copiar</button>' + ['https://chatgpt.com/|ChatGPT', 'https://gemini.google.com/app|Gemini', 'https://claude.ai/new|Claude'].map(x => '<button class="btn btn-ghost" data-act="openAI"' + (n ? ' data-n="' + n + '"' : '') + ' data-u="' + x.split('|')[0] + '">' + x.split('|')[1] + '</button>').join('') + '</div></main>';
+  if (!isDone(7) && !(S.days[7] && S.days[7].step)) return topbar('more') + '<main class="view"><div class="card" style="text-align:center"><div style="font-size:44px">🤖</div><h2 style="margin:8px 0">Liberado no dia 7</h2><p class="muted">O Diário de Liderança com IA fecha o desafio. Ele usa os resultados da sua semana inteira, por isso fica disponível no último dia.</p><button class="btn btn-blue btn-block" style="margin-top:14px" data-go="journey">Continuar o desafio</button></div></main>';
+  return topbar('more') + '<main class="view stack"><div><div class="eyebrow">Prompt de IA pronto</div><h1 style="margin:6px 0 8px">Seu Diário de Liderança</h1><p class="muted">Use sempre que quiser, em 5 minutos. O prompt já usa os resultados da sua semana. Não precisa entender de IA: copie, cole e responda.</p></div><div class="prompt">' + esc(buildPrompt()) + '</div>' +
+    '<div class="grid2"><button class="btn btn-blue" data-act="copyPrompt">📋 Copiar</button><button class="btn btn-ghost" data-act="openAI" data-u="https://chatgpt.com/">ChatGPT</button><button class="btn btn-ghost" data-act="openAI" data-u="https://gemini.google.com/app">Gemini</button><button class="btn btn-ghost" data-act="openAI" data-u="https://claude.ai/new">Claude</button></div></main>';
 }
 
 /* ---------- ações ---------- */
