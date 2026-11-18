@@ -6,8 +6,7 @@
 'use strict';
 
 /* ---------- configuração ---------- */
-const SB_URL = 'https://ylsosycptkjbztbholfe.supabase.co';
-const SB_KEY = 'sb_publishable_4X3e0K8-LwVlomDcvNhkAw_bREibqR3';
+const LP_URL = 'https://empreendedor.vendamaisconectado.com.br/desafio-smart-lider-7-dias-lp/';
 const SUPPORT = 'texas@txs.com.br';
 const STORE_KEY = 'smartlider.v1';
 
@@ -170,7 +169,7 @@ const BADGES = [
   { id: 'pa', e: '⚖️', t: 'Poder x Autoridade' },
   { id: 'belief', e: '🧠', t: 'Crença ressignificada' },
   { id: 'done', e: '🏆', t: 'Desafio completo' },
-  { id: 'team', e: '👥', t: 'Em equipe' },
+  { id: 'invite', e: '💌', t: 'Indicou um líder' },
   { id: 'card', e: '📣', t: 'Resultado compartilhado' },
   { id: 'auth', e: '👑', t: 'Zona de Autoridade' }
 ];
@@ -280,36 +279,28 @@ function topbar(back) {
 }
 function render() {
   const nav = $('#nav');
-  if (!S.onboarded) { nav.hidden = true; app.innerHTML = viewOnboarding(); return; }
+  if (!S.onboarded && route.v !== 'guide') { nav.hidden = true; app.innerHTML = viewOnboarding(); return; }
+  if (!S.onboarded) { nav.hidden = true; app.innerHTML = viewGuide(); simUpdate(); return; }
   const v = route.v;
   const full = v === 'diag' || v === 'day';
   nav.hidden = full;
-  nav.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.go === v || (v === 'ebook' || v === 'prompt' ? b.dataset.go === 'more' : false)));
-  const V = { home: viewHome, journey: viewJourney, day: viewDay, profile: viewProfile, team: viewTeam, more: viewMore, diag: viewDiag, ebook: viewEbook, prompt: viewPrompt }[v] || viewHome;
+  nav.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.go === v || (v === 'ebook' || v === 'prompt' || v === 'guide' ? b.dataset.go === 'more' : false)));
+  const V = { home: viewHome, journey: viewJourney, day: viewDay, profile: viewProfile, share: viewShare, guide: viewGuide, more: viewMore, diag: viewDiag, ebook: viewEbook, prompt: viewPrompt }[v] || viewHome;
   app.innerHTML = V();
   animateRadar();
-  if (v === 'team' && S.team) loadBoard();
+  if (v === 'guide') simUpdate();
 }
 
 /* ---------- onboarding ---------- */
-let ob = { step: 0, mode: 'solo', teamAct: 'create' };
-const invite = new URLSearchParams(location.search).get('time');
-if (invite && !S.team) { ob.mode = 'team'; ob.teamAct = 'join'; ob.code = invite.toUpperCase(); }
+let ob = { step: 0 };
 function viewOnboarding() {
-  const dots = '<div class="dots">' + [0, 1, 2].map(i => '<i class="' + (i === ob.step ? 'on' : '') + '"></i>').join('') + '</div>';
+  const dots = '<div class="dots">' + [0, 2].map(i => '<i class="' + (i === ob.step ? 'on' : '') + '"></i>').join('') + '</div>';
   if (ob.step === 0) return '<div class="ob view"><div class="logo-wrap"><span class="logo-sl"></span><span class="chip-ia">IA</span></div>' +
     '<div class="eyebrow">Desafio de 7 dias</div><h1 style="margin:8px 0 12px">Pare de ser o gargalo do seu próprio time.</h1>' +
     '<p style="color:#C9D6FA;font-size:17px">1 microação por dia, de 10 a 15 minutos. Primeiro você descobre que tipo de líder é hoje. No dia 7, suas próprias ações desenham o formato da sua liderança.</p>' +
     '<div class="stack" style="margin-top:22px"><div class="row" style="gap:10px;color:#C9D6FA;font-size:14px"><span>🧭 Diagnóstico</span><span>📅 7 microações</span><span>🏆 Perfil + cartão</span></div></div>' +
-    '<button class="btn btn-gold btn-block" style="margin-top:26px" data-act="obNext">Começar agora</button>' + dots + '</div>';
-  if (ob.step === 1) return '<div class="ob view"><div class="eyebrow">Passo 1 de 2</div><h1 style="margin:8px 0 18px">Como você vai fazer o desafio?</h1>' +
-    '<button class="choice ' + (ob.mode === 'solo' ? 'on' : '') + '" data-act="obMode" data-m="solo"><span class="ic">🙋</span><div><b>Individual</b><span>Só eu, no meu ritmo. Meu progresso fica no meu aparelho.</span></div></button>' +
-    '<button class="choice ' + (ob.mode === 'team' ? 'on' : '') + '" data-act="obMode" data-m="team"><span class="ic">👥</span><div><b>Em grupo de líderes</b><span>Com outros líderes da empresa, com painel e ranking da equipe.</span></div></button>' +
-    (ob.mode === 'team' ? '<div class="seg" style="margin-top:16px;background:rgba(255,255,255,.1)"><button class="' + (ob.teamAct === 'create' ? 'on' : '') + '" data-act="obTeam" data-t="create" style="' + (ob.teamAct === 'create' ? '' : 'color:#C9D6FA') + '">Criar um grupo</button><button class="' + (ob.teamAct === 'join' ? 'on' : '') + '" data-act="obTeam" data-t="join" style="' + (ob.teamAct === 'join' ? '' : 'color:#C9D6FA') + '">Tenho um código</button></div>' +
-      (ob.teamAct === 'create' ? '<label class="f">Nome do grupo</label><input type="text" id="obTeamName" maxlength="80" placeholder="Ex.: Líderes Comercial" value="' + esc(ob.teamName || '') + '"><label class="f">Empresa (opcional)</label><input type="text" id="obCompany" maxlength="80" placeholder="Ex.: Rede Âncora" value="' + esc(ob.company || '') + '">'
-        : '<label class="f">Código do grupo</label><input type="text" id="obCode" maxlength="6" placeholder="Ex.: K7H4QP" style="text-transform:uppercase;letter-spacing:.2em;font-weight:800" value="' + esc(ob.code || '') + '">') : '') +
-    '<button class="btn btn-gold btn-block" style="margin-top:22px" data-act="obNext">Continuar</button>' + dots + '</div>';
-  return '<div class="ob view"><div class="eyebrow">Passo 2 de 2</div><h1 style="margin:8px 0 6px">Como podemos te chamar?</h1><p style="color:#C9D6FA">Seu nome aparece no seu cartão de resultado' + (ob.mode === 'team' ? ' e no painel do grupo' : '') + '.</p>' +
+    '<button class="btn btn-gold btn-block" style="margin-top:26px" data-act="obNext">Começar agora</button><button class="btn btn-ghost btn-block" style="margin-top:10px" data-act="obGuide">Como o app funciona?</button>' + dots + '</div>';
+  return '<div class="ob view"><div class="eyebrow">Último passo</div><h1 style="margin:8px 0 6px">Como podemos te chamar?</h1><p style="color:#C9D6FA">Seu nome aparece no seu cartão de resultado.</p>' +
     '<label class="f">Seu nome</label><input type="text" id="obName" maxlength="60" autocomplete="name" placeholder="Ex.: Ana Souza" value="' + esc(S.user.name) + '">' +
     '<label class="f">Seu cargo (opcional)</label><input type="text" id="obRole" maxlength="60" placeholder="Ex.: Gerente de loja" value="' + esc(S.user.role) + '">' +
     '<button class="btn btn-gold btn-block" style="margin-top:22px" data-act="obFinish" id="obFinishBtn">Descobrir meu tipo de líder →</button>' +
@@ -333,9 +324,10 @@ function viewHome() {
     '<div><div class="muted small">' + hi + ',</div><h2>' + esc(firstName()) + '</h2><div class="small" style="color:#FFC53D;font-weight:700;margin-top:2px">' + lv.name + '</div></div></div>' +
     '<div class="level"><div class="row between small muted" style="margin-bottom:6px"><span>⚡ ' + S.xp + ' XP</span><span>' + (lv.next ? 'Próximo: ' + lv.next + ' (' + lv.to + ')' : 'Nível máximo') + '</span></div><div class="bar"><i style="width:' + lvPct + '%"></i></div></div></section>' +
     todayCard +
+    (doneCount() < 2 ? '<button class="card row" style="width:100%;text-align:left" data-go="guide"><span style="font-size:28px">📖</span><div><b>Como o app funciona</b><div class="small muted">Exemplos, simulações e o que fazer em cada dia</div></div><span style="margin-left:auto">→</span></button>' : '') +
     '<div class="card"><div class="row between"><h3>Sua semana</h3><span class="small muted">' + (S.streak ? '🔥 ' + S.streak + ' dia' + (S.streak > 1 ? 's' : '') + ' seguido' + (S.streak > 1 ? 's' : '') : '1 microação por dia') + '</span></div>' + week + '</div>' +
     shape + installCard() +
-    (S.team ? '<button class="card row" style="width:100%;text-align:left" data-go="team"><span style="font-size:28px">👥</span><div><b>' + esc(S.team.name) + '</b><div class="small muted">Veja como o seu grupo está avançando</div></div><span style="margin-left:auto">→</span></button>' : '') +
+    (S.diag ? '<button class="card row" style="width:100%;text-align:left" data-go="share"><span style="font-size:28px">📣</span><div><b>Compartilhe sua evolução</b><div class="small muted">Poste seu resultado e inspire outros líderes</div></div><span style="margin-left:auto">→</span></button>' : '') +
     '</main>';
 }
 function radarAnimated(sc, size, opts) {
@@ -480,7 +472,7 @@ async function drawCard() {
   const sc = scores(), t = topK(sc), st = STY[t];
   // topo
   rr(x, 70, 70, 400, 110, 26, '#fff'); if (lg) x.drawImage(lg, 95, 85, 280, 280 * 181 / 560); rr(x, 385, 103, 62, 44, 10, '#F79300'); x.fillStyle = '#061233'; x.font = '800 26px Inter, sans-serif'; x.textAlign = 'center'; x.fillText('IA', 416, 135);
-  x.textAlign = 'left'; x.fillStyle = '#FFC53D'; x.font = '700 30px Inter, sans-serif'; x.fillText('MEU PERFIL DE LÍDER DA SEMANA', 70, 260);
+  x.textAlign = 'left'; x.fillStyle = '#FFC53D'; x.font = '700 30px Inter, sans-serif'; x.fillText(isDone(7) ? 'MEU PERFIL DE LÍDER DA SEMANA' : sc._days ? 'MEU PERFIL EM CONSTRUÇÃO · DIA ' + doneCount() + ' DE 7' : 'MEU ESTILO DE LIDERANÇA DE PARTIDA', 70, 260);
   x.fillStyle = '#fff'; x.font = '800 92px Fraunces, Georgia, serif'; x.fillText(st.name, 70, 370);
   x.fillStyle = '#FFC53D'; x.font = '600 46px Fraunces, Georgia, serif'; x.fillText(st.verb + ' · ' + sc[t] + '%', 70, 440);
   x.fillStyle = '#AFC0EE'; x.font = '500 34px Inter, sans-serif'; x.fillText(S.user.name ? S.user.name + (S.user.role ? ' · ' + S.user.role : '') : '', 70, 500);
@@ -531,50 +523,85 @@ function aiBlock(n) {
     '<div class="grid2" style="margin-top:12px"><button class="btn btn-blue" data-act="copyPrompt" data-n="' + n + '">📋 Copiar prompt</button><button class="btn btn-ghost" data-act="openAI" data-n="' + n + '" data-u="https://chatgpt.com/">ChatGPT</button><button class="btn btn-ghost" data-act="openAI" data-n="' + n + '" data-u="https://gemini.google.com/app">Gemini</button><button class="btn btn-ghost" data-act="openAI" data-n="' + n + '" data-u="https://claude.ai/new">Claude</button></div></div>';
 }
 
-/* ---------- equipe ---------- */
-async function rpc(fn, body) {
-  const r = await fetch(SB_URL + '/rest/v1/rpc/' + fn, { method: 'POST', headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  if (!r.ok) throw new Error('rpc ' + r.status); const t = await r.text(); return t ? JSON.parse(t) : null;
+function sync() { return Promise.resolve(); }
+
+/* ---------- compartilhar ---------- */
+function shareLine() {
+  const sc = scores(), t = STY[topK(sc)], dc = doneCount();
+  if (isDone(7)) return 'Terminei o Desafio Smart Líder IA e descobri o formato da minha liderança: ' + t.name + ' (' + t.verb + ', ' + sc[topK(sc)] + '%).';
+  if (dc) return 'Estou no dia ' + dc + ' de 7 do Desafio Smart Líder IA. Até aqui, meu estilo predominante é ' + t.name + ' (' + t.verb + ').';
+  return 'Comecei o Desafio Smart Líder IA. Meu estilo de liderança de partida é ' + t.name + ' (' + t.verb + ').';
 }
-async function sync() {
-  if (!S.team) return; const sc = scores(); const t = (S.diag || sc._days) ? STY[topK(sc)].short : '';
-  try { await rpc('sl_sync', { p_member: S.memberId, p_code: S.team.code, p_name: S.user.name || 'Líder', p_role: S.user.role || '', p_done: doneCount(), p_xp: S.xp, p_streak: S.streak, p_style: t, p_scores: { int: sc.int, com: sc.com, rel: sc.rel, imp: sc.imp, pa: paScore() } }); S.pending = false; }
-  catch (e) { S.pending = true; } save();
+function posts() {
+  const sc = scores(), lo = STY[lowK(sc)], pa = paScore(), nb = S.days[6] && S.days[6].r3 ? S.days[6].r3.trim() : '';
+  const learn = [];
+  if (pa != null) learn.push('Descobri que ' + pa + '% das minhas atitudes vêm da autoridade, e não do cargo.');
+  learn.push('Meu ponto de desenvolvimento agora é ' + lo.verb.toLowerCase() + '.');
+  if (nb) learn.push('Minha nova crença: "' + nb + '"');
+  return [
+    { id: 'wa', icon: '💬', title: 'WhatsApp e Status', text: shareLine() + '\n\nSão 7 dias, 1 microação de 10 a 15 minutos por dia, para sair do modo chefe e fazer o time andar sem depender de você. Se você lidera pessoas, vale conhecer 👇\n' + LP_URL },
+    { id: 'li', icon: '💼', title: 'LinkedIn', text: 'Liderança se treina. 💡\n\n' + shareLine() + '\n\n' + learn.map(l => '✅ ' + l).join('\n') + '\n\nO que mais me marcou: a diferença entre chefe e líder não está no cargo, está em 4 comportamentos práticos (Consciência, Guiar, Inspirar e Desenvolver).\n\nSe você lidera uma equipe, recomendo o Desafio Smart Líder IA, do Pedro Berto: ' + LP_URL + '\n\n#liderança #gestãodepessoas #desenvolvimento #SmartLider' },
+    { id: 'ig', icon: '📸', title: 'Instagram (legenda para o cartão)', text: shareLine() + ' 🚀\n\n7 dias, 1 microação por dia, e no final um retrato real de como eu lidero.\n\nQuer descobrir o seu? Link do Desafio Smart Líder IA nos stories. 🔗\n\n#liderança #líder #gestão #SmartLider' }
+  ];
 }
-let board = null, boardErr = false;
-async function loadBoard() {
-  try { board = await rpc('sl_board', { p_code: S.team.code }); boardErr = false; } catch (e) { boardErr = true; }
-  if (route.v === 'team') { const el = $('#board'); if (el) el.innerHTML = boardHTML(); const st = $('#teamStats'); if (st) st.innerHTML = teamStatsHTML(); animateRadar(); }
+function lowK(sc) { return KEYS.slice().sort((a, b) => sc[a] - sc[b])[0]; }
+function viewShare() {
+  if (!S.diag) return topbar() + '<main class="view"><div class="card" style="text-align:center"><div style="font-size:48px">📣</div><h2 style="margin:8px 0">Primeiro, descubra o seu estilo</h2><p class="muted">Depois do diagnóstico de 2 minutos você ganha um cartão de resultado para postar e posts prontos para inspirar outros líderes.</p><button class="btn btn-gold btn-block" style="margin-top:14px" data-act="startDiag">Fazer meu diagnóstico</button></div></main>';
+  const ps = posts();
+  return topbar() + '<main class="view stack">' +
+    '<div class="card dark"><div class="eyebrow">Compartilhar</div><h2 style="margin:6px 0">Inspire outros líderes</h2><p class="muted">Postar a sua evolução reforça o seu compromisso, e quem vê descobre um caminho prático para liderar melhor. ' + (isDone(7) ? 'Seu perfil final está pronto.' : 'O cartão se atualiza a cada dia concluído.') + '</p></div>' +
+    '<div class="card"><h3>📣 Seu cartão de resultado</h3><div id="cardWrap" style="margin-top:12px"></div><div class="grid2" style="margin-top:12px"><button class="btn btn-gold" data-act="shareCard">Compartilhar</button><button class="btn btn-ghost" data-act="downloadCard">Baixar imagem</button></div></div>' +
+    '<div class="section-t">Posts prontos, com os seus resultados</div>' +
+    ps.map((p, i) => '<div class="card"><div class="row between"><h3>' + p.icon + ' ' + p.title + '</h3></div><div class="prompt" style="margin-top:10px;font-family:var(--font-b);background:#F4F7FE;color:var(--text)">' + esc(p.text) + '</div><div class="grid2" style="margin-top:10px"><button class="btn btn-blue" data-act="copyPost" data-i="' + i + '">📋 Copiar texto</button>' +
+      (p.id === 'wa' ? '<button class="btn btn-ghost" data-act="waPost" data-i="' + i + '">Enviar no WhatsApp</button>' : p.id === 'li' ? '<button class="btn btn-ghost" data-act="liPost" data-i="' + i + '">Abrir o LinkedIn</button>' : '<button class="btn btn-ghost" data-act="downloadCard">Baixar o cartão</button>') + '</div></div>').join('') +
+    '<div class="card action"><h3>💌 Indique para um líder</h3><p class="muted small" style="margin-top:4px">Conhece alguém que vive apagando incêndio e centralizando tudo? Mande uma mensagem pessoal.</p><button class="btn btn-gold btn-block" style="margin-top:12px" data-act="invite">Indicar pelo WhatsApp</button><button class="btn btn-ghost btn-block" style="margin-top:8px" data-act="inviteCopy">Copiar mensagem</button></div>' +
+    '</main>';
 }
-function boardHTML() {
-  if (boardErr) return '<p class="muted">Sem conexão agora. Tente de novo em instantes.</p>';
-  if (!board) return '<p class="muted">Carregando o grupo…</p>';
-  if (!board.length) return '<p class="muted">Ninguém por aqui ainda. Convide os líderes com o código acima.</p>';
-  return board.map((m, i) => { const k = KEYS.find(k => STY[k].short === m.style); const col = k ? STY[k].color : '#0A3CB0'; return '<div class="member"><div class="avatar" style="background:' + col + '">' + esc((m.name || '?').trim().charAt(0).toUpperCase()) + '</div><div><div class="n">' + (i < 3 && m.done ? ['🥇 ', '🥈 ', '🥉 '][i] : '') + esc(m.name) + '</div><div class="m">' + (m.role ? esc(m.role) + ' · ' : '') + (m.style ? esc(m.style) : 'sem perfil ainda') + (m.streak ? ' · 🔥 ' + m.streak : '') + '</div></div><div class="p">' + m.done + '/7<div class="small muted" style="font:600 11px var(--font-b)">' + m.xp + ' XP</div></div></div>'; }).join('');
+function inviteText() { return 'Oi! Estou fazendo o Desafio Smart Líder IA e lembrei de você. São 7 dias, 10 a 15 minutos por dia, com uma microação prática para a equipe parar de depender de tudo da gente. ' + (S.diag ? 'Já descobri o meu estilo: ' + STY[topK(scores())].name + '. ' : '') + 'Acho que você vai gostar: ' + LP_URL; }
+function openWA(t) { window.open('https://wa.me/?text=' + encodeURIComponent(t), '_blank', 'noopener'); }
+
+/* ---------- guia: como usar o app ---------- */
+let sim = { int: 60, com: 45, rel: 82, imp: 38, pa: 6 };
+function viewGuide() {
+  const step = (n, t, d) => '<div class="row" style="align-items:flex-start;margin-top:14px"><div class="jnum" style="width:38px;height:38px;font-size:18px">' + n + '</div><div><b>' + t + '</b><div class="muted small" style="margin-top:2px">' + d + '</div></div></div>';
+  const ex = [
+    ['1', 'Postura Emocional', 'Um vendedor perde uma meta importante. Em vez de dar a bronca na hora, Carla aplica a Pausa de 90 segundos e pergunta: “o que aconteceu e o que você precisa para recuperar?”. A conversa termina com um plano, não com um clima pesado.'],
+    ['2', 'Propósito da Autoridade', 'Para pedir a reorganização do estoque, ela usa a Fórmula P.O.R.: “Por quê: os clientes estão esperando demais. O quê: estoque organizado até sexta. Resultado: achar qualquer produto em 1 minuto. O que você precisa de mim?”'],
+    ['3', 'Qualidade das Relações', 'Ela elogia de forma específica: “Quando você ligou para aquele cliente insatisfeito, ele voltou e comprou de novo. Obrigada.” E tem 10 minutos de conversa só para escutar um colaborador mais calado.'],
+    ['4', 'Construção de Autonomia', 'Os descontos acima de 5% só passavam por ela. Carla sobe um degrau na Escada da Autonomia: o subgerente passa a decidir até 10% e informa no fim do dia.'],
+    ['5', 'Poder x Autoridade', 'Ela faz o teste em 3 minutos: 50%, Zona de Transição. Descobre que ainda “encerra a discussão” quando discordam dela.'],
+    ['6', 'Crenças que Travam', 'A crença “se eu não fizer, ninguém faz direito” aparece com força. Ela lembra de 2 vezes em que a equipe resolveu tudo sem ela e reescreve: “quando eu ensino direito, as pessoas fazem bem”.'],
+    ['7', 'Perfil e plano', 'O app revela o formato dela: Estilo Relacional (Inspirar) forte, com Desenvolver como ponto de atenção. Ela usa o prompt de IA, escolhe 3 compromissos para a semana e posta o cartão no LinkedIn.']
+  ];
+  return topbar('more') + '<main class="view stack">' +
+    '<div><div class="eyebrow">Guia do app</div><h1 style="margin:6px 0 8px">Como o Smart Líder funciona</h1><p class="muted">Em 2 minutos de leitura você entende o que fazer, quanto tempo leva e o que vai receber no final.</p></div>' +
+    '<div class="card dark"><h3>Em uma frase</h3><p style="margin-top:6px">Em 7 dias, com 10 a 15 minutos por dia, você pratica os 4 comportamentos que separam o chefe do líder. No final, as suas próprias ações desenham o formato da sua liderança.</p></div>' +
+    '<div class="card"><h3>🎁 O que você recebe</h3>' +
+      [['🧭', 'Diagnóstico de partida', 'Seu tipo de líder hoje, em 2 minutos, logo no começo.'], ['📘', 'E-book dentro do app', 'Um capítulo curto por dia, para ler no celular ou no computador.'], ['✅', 'Ferramenta interativa', 'Checklist diário, autoavaliação e acompanhamento do progresso.'], ['⚖️', 'Diagnóstico Poder x Autoridade', 'Resultado na hora, no dia 5.'], ['🧠', 'Nova crença', 'Você troca uma crença que te trava por uma que te impulsiona.'], ['💎', 'Perfil semanal', 'Seu estilo predominante, comparado com o diagnóstico do início.'], ['🗓️', 'Plano da próxima semana', '3 compromissos práticos, com lembretes na agenda.'], ['📣', 'Cartão de resultado', 'Pronto para compartilhar nas redes.'], ['🤖', 'Prompt de IA pronto', 'No dia 7, para o seu diário de liderança.']].map(x => '<div class="row" style="margin-top:12px;align-items:flex-start"><span style="font-size:22px">' + x[0] + '</span><div><b>' + x[1] + '</b><div class="muted small">' + x[2] + '</div></div></div>').join('') + '</div>' +
+    '<div class="card"><h3>⏱️ Sua rotina em cada dia</h3>' +
+      step(1, 'De manhã, 3 minutos: leia o capítulo do dia', 'Ele explica o comportamento e traz uma ferramenta simples.') +
+      step(2, 'Durante o dia: aplique a microação', 'É uma ação real com a sua equipe, numa situação que já vai acontecer de qualquer jeito.') +
+      step(3, 'No fim do dia, 5 minutos: marque o checklist e se avalie', 'Notas de 1 a 5 em 4 frases. São elas que desenham o seu formato.') +
+      step(4, 'Registre em 2 linhas o que aconteceu', 'Escrever fixa o aprendizado e vale +20 pontos.') +
+      '<p class="small muted" style="margin-top:14px">💡 Você pode sair a qualquer momento: o app guarda o ponto onde você parou. Cada dia concluído libera o próximo.</p></div>' +
+    '<div class="card"><h3>🎮 Simulação: como o seu formato se desenha</h3><p class="muted small" style="margin-top:4px">Mexa nos controles para ver como cada estilo muda a forma. No desafio, quem mexe nesses controles são as suas notas dos dias 1 a 4, não um palpite.</p><div id="simRadar" style="margin-top:8px"></div>' +
+      KEYS.map(k => '<div style="margin-top:10px"><div class="row between small"><b style="color:' + STY[k].color + '">' + STY[k].short + ' · ' + STY[k].verb + '</b><span id="simv-' + k + '">' + sim[k] + '%</span></div><input type="range" min="10" max="100" value="' + sim[k] + '" data-field="sim" data-k="' + k + '" style="width:100%;accent-color:' + STY[k].color + '"></div>').join('') +
+      '<div id="simText" class="card action" style="margin-top:14px"></div></div>' +
+    '<div class="card"><h3>⚖️ Simulação: Poder x Autoridade</h3><p class="muted small" style="margin-top:4px">No dia 5 você responde 10 situações. Arraste para ver o resultado conforme o número de respostas de autoridade.</p><input type="range" min="0" max="10" value="' + sim.pa + '" data-field="simpa" style="width:100%;margin-top:12px;accent-color:#0A3CB0"><div class="gauge"><i id="simGauge" style="left:' + sim.pa * 10 + '%"></i></div><div class="row between small muted"><span>Poder</span><span>Autoridade</span></div><p id="simPaText" style="margin-top:10px"></p></div>' +
+    '<div class="card"><h3>👩‍💼 Exemplo real: a semana da Carla</h3><p class="muted small" style="margin-top:4px">Carla é gerente de uma loja com 12 pessoas. Veja o que ela fez em cada dia.</p>' +
+      ex.map(e => '<details style="margin-top:10px;border:1px solid var(--line);border-radius:14px;padding:12px 14px"><summary style="cursor:pointer;font-weight:700;color:var(--ink)">Dia ' + e[0] + ' · ' + e[1] + '</summary><p class="muted" style="margin-top:8px">' + e[2] + '</p></details>').join('') + '</div>' +
+    '<div class="card"><h3>✅ O que o líder deve fazer</h3><ul style="margin:10px 0 0 18px;line-height:1.7"><li><b>Seja honesto</b> na autoavaliação. Nota alta sem prática só esconde o seu ponto de crescimento.</li><li><b>Pratique com a equipe real.</b> A microação só funciona fora do app.</li><li><b>Um dia por vez.</b> Se perder um dia, continue no seguinte, sem culpa.</li><li><b>Use o fim de semana</b> (dias 6 e 7) para refletir com calma.</li><li><b>No final, poste o seu cartão.</b> Assumir publicamente reforça o compromisso.</li></ul></div>' +
+    '<div class="card"><h3>❓ Dúvidas rápidas</h3>' +
+      [['Preciso entender de IA?', 'Não. No dia 7 o prompt já vem pronto: você copia, cola e responde.'], ['Meus dados ficam onde?', 'No seu próprio aparelho. Para trocar de aparelho, use “Salvar uma cópia do meu progresso”, no menu Mais.'], ['Posso refazer?', 'Sim. Ao terminar, toque em “Nova semana” para treinar de novo e comparar o resultado.'], ['Funciona sem internet?', 'Sim, depois de aberto uma vez. Ou instale o app na tela inicial.']].map(f => '<details style="margin-top:10px"><summary style="cursor:pointer;font-weight:600">' + f[0] + '</summary><p class="muted small" style="margin-top:6px">' + f[1] + '</p></details>').join('') + '</div>' +
+    '<button class="btn btn-gold btn-block" data-act="guideStart">' + (S.onboarded ? (S.diag ? 'Continuar o desafio →' : 'Fazer meu diagnóstico →') : 'Começar agora →') + '</button></main>';
 }
-function teamStatsHTML() {
-  if (!board || !board.length) return '';
-  const avg = {}; KEYS.forEach(k => { const v = board.map(m => m.scores && m.scores[k]).filter(x => x > 0); avg[k] = v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : 0; });
-  const comp = Math.round(board.reduce((a, m) => a + m.done, 0) / (board.length * 7) * 100);
-  const fin = board.filter(m => m.done === 7).length;
-  const dist = KEYS.map(k => ({ k, n: board.filter(m => m.style === STY[k].short).length }));
-  const pas = board.map(m => m.scores && m.scores.pa).filter(x => x != null); const paAvg = pas.length ? Math.round(pas.reduce((a, b) => a + b, 0) / pas.length) : null;
-  return '<div class="grid2"><div class="lg"><div class="k">Líderes</div><div class="v">' + board.length + '</div></div><div class="lg"><div class="k">Conclusão média</div><div class="v">' + comp + '%</div></div><div class="lg"><div class="k">Concluíram os 7 dias</div><div class="v">' + fin + '</div></div><div class="lg"><div class="k">Autoridade média</div><div class="v">' + (paAvg != null ? paAvg + '%' : '–') + '</div></div></div>' +
-    (KEYS.some(k => avg[k]) ? '<h3 style="margin-top:18px">Formato médio do grupo</h3>' + radarAnimated(avg, 280) + '<h3 style="margin-top:8px">Estilos predominantes</h3>' + dist.map(d => '<div style="margin-top:10px"><div class="row between small"><b style="color:' + STY[d.k].color + '">' + STY[d.k].name + '</b><span class="muted">' + d.n + '</span></div><div class="bar light" style="margin-top:4px"><i style="width:' + (d.n / board.length * 100) + '%;background:' + STY[d.k].color + '"></i></div></div>').join('') : '');
-}
-function inviteLink() { return location.origin + location.pathname + '?time=' + S.team.code; }
-let teamTab = 'create';
-function viewTeam() {
-  if (!S.team) return topbar() + '<main class="view stack"><div class="card dark"><div style="font-size:40px">👥</div><h2 style="margin:6px 0">Faça o desafio em grupo</h2><p class="muted">Junte os líderes da empresa: cada um faz o seu desafio, e o grupo acompanha o avanço de todos num painel com ranking, formato médio e estilos predominantes.</p></div>' +
-    '<div class="card"><div class="seg"><button class="' + (teamTab === 'create' ? 'on' : '') + '" data-act="teamTab" data-t="create">Criar grupo</button><button class="' + (teamTab === 'join' ? 'on' : '') + '" data-act="teamTab" data-t="join">Entrar com código</button></div>' +
-    (teamTab === 'create' ? '<label class="f">Nome do grupo</label><input type="text" id="tName" maxlength="80" placeholder="Ex.: Líderes Comercial"><label class="f">Empresa (opcional)</label><input type="text" id="tCompany" maxlength="80"><button class="btn btn-gold btn-block" style="margin-top:16px" data-act="createTeam">Criar e gerar código</button>'
-      : '<label class="f">Código do grupo</label><input type="text" id="tCode" maxlength="6" placeholder="Ex.: K7H4QP" style="text-transform:uppercase;letter-spacing:.2em;font-weight:800"><button class="btn btn-gold btn-block" style="margin-top:16px" data-act="joinTeam">Entrar no grupo</button>') +
-    '<p class="small muted" style="margin-top:12px">O grupo vê só o resumo: nome, cargo, dias concluídos, pontos e estilo. Suas anotações pessoais nunca saem do seu aparelho.</p></div></main>';
-  return topbar() + '<main class="view stack"><div class="card dark"><div class="row between"><div><div class="eyebrow">Grupo</div><h2>' + esc(S.team.name) + '</h2>' + (S.team.company ? '<div class="muted small">' + esc(S.team.company) + '</div>' : '') + '</div><button class="btn btn-ghost" style="padding:8px 12px" data-act="refreshBoard">↻</button></div></div>' +
-    '<div class="card"><div class="small muted" style="margin-bottom:8px">Código de convite</div><div class="code">' + esc(S.team.code) + '</div><div class="grid2" style="margin-top:12px"><button class="btn btn-blue" data-act="shareInvite">Convidar líderes</button><button class="btn btn-ghost" data-act="copyInvite">Copiar link</button></div></div>' +
-    '<div class="card"><h3>Ranking do grupo</h3><div id="board" style="margin-top:6px">' + boardHTML() + '</div></div>' +
-    '<div class="card"><h3>Painel do gestor</h3><div id="teamStats" style="margin-top:12px">' + teamStatsHTML() + '</div></div>' +
-    '<button class="btn btn-ghost btn-block" data-act="leaveTeam">Sair do grupo</button></main>';
+function simUpdate() {
+  const r = $('#simRadar'); if (!r) return;
+  r.innerHTML = radar(sim, 300);
+  const t = STY[topK(sim)], l = STY[lowK(sim)];
+  $('#simText').innerHTML = '<b>Neste exemplo: ' + t.name + ' (' + t.verb + ')</b><p class="small" style="margin-top:4px">' + t.desc + '</p><p class="small muted" style="margin-top:6px">Ponto a desenvolver: <b>' + l.verb + '</b>. ' + l.grow + '</p>';
+  const v = sim.pa * 10, z = paZone(v); const g = $('#simGauge'); if (g) g.style.left = v + '%';
+  $('#simPaText').innerHTML = '<b>' + v + '% · ' + z[0] + '.</b> <span class="muted">' + z[1] + '</span>';
 }
 
 /* ---------- mais ---------- */
@@ -591,6 +618,7 @@ function installCard() {
 function viewMore() {
   const it = (e, t, act, extra) => '<button ' + act + '><span class="e">' + e + '</span><span>' + t + (extra ? '<div class="small muted" style="font-weight:500">' + extra + '</div>' : '') + '</span><span class="chev">›</span></button>';
   return topbar() + '<main class="view stack"><div class="card mlist">' +
+    it('🧭', 'Como usar o app', 'data-go="guide"', 'Exemplos, simulações e o passo a passo') +
     it('📘', 'E-book do desafio', 'data-go="ebook"', 'Leia todos os capítulos no app') +
     it('🤖', 'Prompt de IA do diário', 'data-go="prompt"', isDone(7) ? 'Pronto para ChatGPT, Gemini ou Claude' : 'Liberado no dia 7') +
     it('🧭', 'Refazer o diagnóstico', 'data-act="startDiag"', 'Veja se o seu estilo de partida mudou') +
@@ -628,16 +656,11 @@ function icsFile(events) {
   return new Blob([s + 'END:VCALENDAR\r\n'], { type: 'text/calendar' });
 }
 const ACT = {
-  obNext() { if (ob.step === 1 && ob.mode === 'team') { if (ob.teamAct === 'create') { ob.teamName = ($('#obTeamName').value || '').trim(); ob.company = ($('#obCompany').value || '').trim(); if (!ob.teamName) return toast('Dê um nome ao grupo'); } else { ob.code = ($('#obCode').value || '').trim().toUpperCase(); if (ob.code.length !== 6) return toast('O código tem 6 caracteres'); } } ob.step++; render(); },
-  obBack() { ob.step--; render(); },
-  obMode(el) { ob.mode = el.dataset.m; render(); },
-  obTeam(el) { ob.teamAct = el.dataset.t; render(); },
+  obNext() { ob.step = 2; render(); },
+  obGuide() { go('guide'); },
+  obBack() { ob.step = 0; render(); },
   async obFinish() {
     const name = ($('#obName').value || '').trim(); if (!name) return toast('Digite seu nome'); S.user.name = name; S.user.role = ($('#obRole').value || '').trim();
-    if (ob.mode === 'team') { const b = $('#obFinishBtn'); b.disabled = true; b.textContent = 'Conectando ao grupo…';
-      try { if (ob.teamAct === 'create') { const code = await rpc('sl_create_team', { p_name: ob.teamName, p_company: ob.company || '' }); S.team = { code, name: ob.teamName, company: ob.company || '' }; }
-        else { const info = await rpc('sl_team_info', { p_code: ob.code }); if (!info) { b.disabled = false; b.textContent = 'Descobrir meu tipo de líder →'; ob.step = 1; render(); return toast('Código não encontrado. Confira com quem te convidou.'); } S.team = { code: info.code, name: info.name, company: info.company }; }
-        S.mode = 'team'; award('team'); } catch (e) { toast('Sem conexão: você começa no modo individual e entra no grupo depois.'); } }
     S.onboarded = true; save(); sync(); try { history.replaceState(null, '', location.pathname); } catch (e) {}
     quiz = { i: 0, a: [] }; go('diag');
   },
@@ -659,9 +682,15 @@ const ACT = {
   beliefPick(el) { const s = D(6); s.pick = +el.dataset.i; save(); render(); },
   useSuggest() { const s = D(6); s.r3 = BELIEFS[s.pick].n; save(); render(); },
   planPick(el) { const s = D(7); s.plan = s.plan || []; const t = el.dataset.t; const k = s.plan.indexOf(t); if (k >= 0) s.plan.splice(k, 1); else { if (s.plan.length >= 3) return toast('Escolha no máximo 3'); s.plan.push(t); } save(); vibrate(10); render(); },
+  copyPost(el) { copy(posts()[+el.dataset.i].text); award('card'); },
+  waPost(el) { openWA(posts()[+el.dataset.i].text); award('card'); },
+  liPost(el) { copy(posts()[+el.dataset.i].text); award('card'); toast('Texto copiado. Cole no LinkedIn ✅'); setTimeout(() => window.open('https://www.linkedin.com/feed/?shareActive=true', '_blank', 'noopener'), 400); },
+  invite() { openWA(inviteText()); award('invite'); },
+  inviteCopy() { copy(inviteText()); award('invite'); },
+  guideStart() { if (!S.onboarded) { ob.step = 0; route = { v: 'home' }; render(); window.scrollTo({ top: 0 }); return; } if (!S.diag) { quiz = { i: 0, a: [] }; go('diag'); } else go('journey'); },
   copyPrompt(el) { copy(el && el.dataset.n ? buildDayPrompt(+el.dataset.n) : buildPrompt()); },
   openAI(el) { copy(el.dataset.n ? buildDayPrompt(+el.dataset.n) : buildPrompt()); setTimeout(() => window.open(el.dataset.u, '_blank', 'noopener'), 300); toast('Prompt copiado. Cole na conversa ✅'); },
-  async shareCard() { const cv = await drawCard(); award('card'); cv.toBlob(async b => { const f = new File([b], 'meu-perfil-smart-lider.png', { type: 'image/png' }); const txt = 'Descobri o formato da minha liderança no Desafio Smart Líder IA: ' + STY[topK(scores())].name + '!';
+  async shareCard() { const cv = await drawCard(); award('card'); cv.toBlob(async b => { const f = new File([b], 'meu-perfil-smart-lider.png', { type: 'image/png' }); const txt = shareLine() + ' ' + LP_URL;
     if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], text: txt }); return; } catch (e) { if (e.name === 'AbortError') return; } } download('meu-perfil-smart-lider.png', b); toast('Imagem baixada. Agora é só postar 📣'); }, 'image/png'); },
   async downloadCard() { const cv = await drawCard(); award('card'); cv.toBlob(b => download('meu-perfil-smart-lider.png', b), 'image/png'); },
   ics() { const plan = (S.days[7] && S.days[7].plan) || []; const ev = []; const base = new Date(); base.setHours(8, 30, 0, 0); let d = new Date(base.getTime() + 864e5); while (ev.length < 5) { if (d.getDay() !== 0 && d.getDay() !== 6) ev.push({ d: new Date(d), t: 'Smart Líder: ' + plan[ev.length % plan.length], x: 'Compromisso da semana do Desafio Smart Líder IA' }); d = new Date(d.getTime() + 864e5); } download('plano-smart-lider.ics', icsFile(ev)); toast('Abra o arquivo para adicionar à agenda'); },
@@ -678,16 +707,6 @@ const ACT = {
   hideInstall() { S.hideInstall = true; save(); render(); },
   restartWeek() { modal('<h2>Começar uma nova semana?</h2><p class="muted" style="margin-top:8px">Seus pontos, conquistas e diagnóstico ficam. Os 7 dias recomeçam para você treinar de novo e ver o seu formato evoluir.</p><button class="btn btn-gold btn-block" style="margin-top:16px" data-act="doRestartWeek" data-close>Sim, nova semana</button><button class="btn btn-ghost btn-block" style="margin-top:8px" data-close>Cancelar</button>'); },
   doRestartWeek() { S.history = S.history || []; S.history.push({ at: Date.now(), scores: scores(), pa: paScore() }); S.days = {}; save(); sync(); go('home'); },
-  teamTab(el) { teamTab = el.dataset.t; render(); },
-  async createTeam(el) { const name = ($('#tName').value || '').trim(), company = ($('#tCompany').value || '').trim(); if (!name) return toast('Dê um nome ao grupo'); el.disabled = true; el.textContent = 'Criando…';
-    try { const code = await rpc('sl_create_team', { p_name: name, p_company: company }); S.team = { code, name, company }; S.mode = 'team'; award('team'); save(); await sync(); render(); confetti(); } catch (e) { el.disabled = false; el.textContent = 'Criar e gerar código'; toast('Sem conexão. Tente de novo.'); } },
-  async joinTeam(el) { const code = ($('#tCode').value || '').trim().toUpperCase(); if (code.length !== 6) return toast('O código tem 6 caracteres'); el.disabled = true; el.textContent = 'Procurando…';
-    try { const info = await rpc('sl_team_info', { p_code: code }); if (!info) { el.disabled = false; el.textContent = 'Entrar no grupo'; return toast('Código não encontrado'); } S.team = { code: info.code, name: info.name, company: info.company }; S.mode = 'team'; award('team'); save(); await sync(); render(); toast('Você entrou em ' + info.name + ' 🎉'); } catch (e) { el.disabled = false; el.textContent = 'Entrar no grupo'; toast('Sem conexão. Tente de novo.'); } },
-  refreshBoard() { board = null; const el = $('#board'); if (el) el.innerHTML = boardHTML(); sync().then(loadBoard); },
-  shareInvite() { const t = 'Vamos fazer juntos o Desafio Smart Líder IA! Entre no grupo "' + S.team.name + '" com o código ' + S.team.code + ': ' + inviteLink(); if (navigator.share) navigator.share({ text: t }).catch(() => {}); else copy(t); },
-  copyInvite() { copy(inviteLink()); },
-  leaveTeam() { modal('<h2>Sair do grupo?</h2><p class="muted" style="margin-top:8px">Seu progresso pessoal continua neste aparelho. Você só deixa de aparecer no painel do grupo.</p><button class="btn btn-gold btn-block" style="margin-top:16px" data-act="doLeave" data-close>Sair do grupo</button><button class="btn btn-ghost btn-block" style="margin-top:8px" data-close>Cancelar</button>'); },
-  async doLeave() { try { await rpc('sl_leave', { p_member: S.memberId }); } catch (e) {} S.team = null; S.mode = 'solo'; board = null; save(); render(); },
   editMe() { const m = modal('<h2>Meus dados</h2><label class="f">Nome</label><input type="text" id="meName" maxlength="60" value="' + esc(S.user.name) + '"><label class="f">Cargo</label><input type="text" id="meRole" maxlength="60" value="' + esc(S.user.role) + '"><button class="btn btn-gold btn-block" style="margin-top:16px" data-act="saveMe">Salvar</button>'); },
   saveMe() { const n = ($('#meName').value || '').trim(); if (n) S.user.name = n; S.user.role = ($('#meRole').value || '').trim(); save(); sync(); document.querySelector('.modal').remove(); render(); toast('Salvo ✅'); },
   export() { const t = btoa(unescape(encodeURIComponent(JSON.stringify(S)))); modal('<h2>Cópia do seu progresso</h2><p class="muted small" style="margin-top:6px">Copie este código e cole em “Restaurar progresso” no outro aparelho ou navegador.</p><textarea readonly style="margin-top:10px;font-size:12px">' + t + '</textarea><button class="btn btn-gold btn-block" style="margin-top:12px" data-act="copyExport">Copiar código</button>'); ACT._exp = t; },
@@ -696,9 +715,11 @@ const ACT = {
   doImport() { try { const o = JSON.parse(decodeURIComponent(escape(atob(($('#impTxt').value || '').trim())))); if (!o || !o.v) throw 0; S = o; save(); document.querySelector('.modal').remove(); go('home'); toast('Progresso restaurado ✅'); } catch (e) { toast('Código inválido'); } },
   support() { location.href = 'mailto:' + SUPPORT + '?subject=' + encodeURIComponent('Suporte · App Smart Líder IA'); },
   reset() { modal('<h2>Recomeçar do zero?</h2><p class="muted" style="margin-top:8px">Isso apaga seu progresso, pontos e diagnóstico deste aparelho. Não dá para desfazer.</p><button class="btn btn-block" style="margin-top:16px;background:#E5484D;color:#fff" data-act="doReset" data-close>Apagar e recomeçar</button><button class="btn btn-ghost btn-block" style="margin-top:8px" data-close>Cancelar</button>'); },
-  doReset() { const id = S.memberId, team = S.team; S = fresh(); S.memberId = id; S.team = team; save(); ob = { step: 0, mode: 'solo', teamAct: 'create' }; render(); }
+  doReset() { const id = S.memberId; S = fresh(); S.memberId = id; save(); ob = { step: 0 }; render(); }
 };
 const FIELD = {
+  sim(f) { sim[f.dataset.k] = +f.value; const o = $('#simv-' + f.dataset.k); if (o) o.textContent = f.value + '%'; simUpdate(); },
+  simpa(f) { sim.pa = +f.value; simUpdate(); },
   note(f) { D(route.n).note = f.value; save(); },
   r1(f) { D(6).r1 = f.value; save(); }, r2(f) { D(6).r2 = f.value; save(); },
   r3(f) { D(6).r3 = f.value; save(); const b = $('[data-act="dayNext"]'); if (b) b.disabled = f.value.trim().length <= 3; },
@@ -707,7 +728,8 @@ const FIELD = {
 
 /* ---------- início ---------- */
 (function boot() {
-  const h = (location.hash || '').slice(1); const m = h.match(/^(home|journey|profile|team|more|ebook|prompt)$/); if (m) route = { v: m[1] };
+  if (S.team) { S.team = null; S.mode = 'solo'; save(); }
+  const h = (location.hash || '').slice(1); const m = h.match(/^(home|journey|profile|share|guide|more|ebook|prompt)$/); if (m) route = { v: m[1] };
   render();
   if (route.v === 'profile') setTimeout(renderCardPreview, 50);
   if (S.pending) sync();

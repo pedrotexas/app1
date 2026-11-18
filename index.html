@@ -217,7 +217,7 @@ label.f{display:block;font-weight:600;margin:14px 0 6px}
 @keyframes pop{0%{transform:scale(.2) rotate(-20deg)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
 .xpfly{font:800 28px var(--font-d);color:var(--gold);animation:pop .7s var(--ease)}
 
-.prompt{white-space:pre-wrap;font-size:14px;line-height:1.55;background:#0B1736;color:#DCE6FF;border-radius:16px;padding:16px;max-height:300px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.prompt{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.55;background:#0B1736;color:#DCE6FF;border-radius:16px;padding:16px;max-height:300px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .belief{display:block;width:100%;text-align:left;padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:#fff;font-weight:500;margin-top:8px;transition:all .2s}
 .belief.on{border-color:#E5484D;background:#FFF2F2}
 .belief.pick{box-shadow:0 0 0 2px var(--gold) inset;background:#FFF8EC;border-color:var(--gold)}
@@ -243,7 +243,7 @@ label.f{display:block;font-weight:600;margin:14px 0 6px}
   <button data-go="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Início</button>
   <button data-go="journey"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h4V9H4zM10 19h4V5h-4zM16 19h4v-7h-4z"/></svg>Desafio</button>
   <button data-go="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 21 12 12 22 3 12z"/><path d="M12 7l4.5 5L12 17l-4.5-5z"/></svg>Meu perfil</button>
-  <button data-go="team"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.6c2.6.1 4.6 1.9 5.3 4.9"/></svg>Equipe</button>
+  <button data-go="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Compartilhar</button>
   <button data-go="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Mais</button>
 </div></nav>
 <canvas id="confetti"></canvas>
