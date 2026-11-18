@@ -229,7 +229,7 @@ const $ = s => document.querySelector(s);
 const app = $('#app');
 function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2600); }
 function vibrate(ms) { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} }
-function addXP(n, why) { S.xp += n; save(); if (why) toast('+' + n + ' pontos · ' + why); }
+function addXP(n, why) { S.xp += n; save(); if (why) toast('+' + n + ' Pontos de Liderança · ' + why); }
 function award(id) { if (S.badges[id]) return; S.badges[id] = Date.now(); save(); const b = BADGES.find(x => x.id === id); if (b) setTimeout(() => toast(b.e + ' Conquista: ' + b.t), 900); }
 function modal(html, onclose) {
   const m = document.createElement('div'); m.className = 'modal'; m.innerHTML = '<div class="sheet">' + html + '</div>';
@@ -275,7 +275,7 @@ document.addEventListener('input', e => { const f = e.target.closest('[data-fiel
 function topbar(back) {
   return '<header class="topbar">' + (back ? '<button class="btn-ghost btn" style="padding:8px 12px" data-go="' + back + '">←</button>' : '') +
     '<span class="logo-sl" role="img" aria-label="Smart Líder"></span><span class="chip-ia">IA</span><span class="sp"></span>' +
-    '<button class="pill fire" data-act="ptsInfo" title="Dias seguidos">🔥 ' + S.streak + '</button><button class="pill xp" data-act="ptsInfo" title="Seus pontos">⚡ ' + S.xp + '</button></header>';
+    '<button class="pill fire" data-act="ptsInfo" title="Dias seguidos">🔥 ' + S.streak + '</button><button class="pill xp" data-act="ptsInfo" title="Seus Pontos de Liderança">⚡ ' + S.xp + '</button></header>';
 }
 function render() {
   const nav = $('#nav');
@@ -322,7 +322,7 @@ function viewHome() {
   return topbar() + '<main class="view stack">' +
     '<section class="card dark"><div class="hello"><div class="ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="9"/><circle cx="50" cy="50" r="42" fill="none" stroke="url(#gg)" stroke-width="9" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + C * (1 - pct) + '" style="transition:stroke-dashoffset 1s"/><defs><linearGradient id="gg"><stop offset="0" stop-color="#FFC53D"/><stop offset="1" stop-color="#F79300"/></linearGradient></defs></svg><div class="v"><div>' + dc + '/7<small>dias</small></div></div></div>' +
     '<div><div class="muted small">' + hi + ',</div><h2>' + esc(firstName()) + '</h2><div class="small" style="color:#FFC53D;font-weight:700;margin-top:2px">' + lv.name + '</div></div></div>' +
-    '<div class="level"><div class="row between small muted" style="margin-bottom:6px"><span>⚡ ' + S.xp + ' pontos</span><span>' + (lv.next ? 'Próximo: ' + lv.next + ' (' + lv.to + ')' : 'Nível máximo') + '</span></div><div class="bar"><i style="width:' + lvPct + '%"></i></div></div></section>' +
+    '<div class="level"><div class="row between small muted" style="margin-bottom:6px"><span>⚡ ' + S.xp + ' Pontos de Liderança</span><span>' + (lv.next ? 'Próximo: ' + lv.next + ' (' + lv.to + ')' : 'Nível máximo') + '</span></div><div class="bar"><i style="width:' + lvPct + '%"></i></div></div></section>' +
     todayCard +
     (doneCount() < 2 ? '<button class="card row" style="width:100%;text-align:left" data-go="guide"><span style="font-size:28px">📖</span><div><b>Como o app funciona</b><div class="small muted">Exemplos, simulações e o que fazer em cada dia</div></div><span style="margin-left:auto">→</span></button>' : '') +
     '<div class="card"><div class="row between"><h3>Sua semana</h3><span class="small muted">' + (S.streak ? '🔥 ' + S.streak + ' dia' + (S.streak > 1 ? 's' : '') + ' seguido' + (S.streak > 1 ? 's' : '') : '1 microação por dia') + '</span></div>' + week + '</div>' +
@@ -564,7 +564,7 @@ function openWA(t) { window.open('https://wa.me/?text=' + encodeURIComponent(t),
 function ptsTable() {
   const row = (a, b) => '<div class="row between" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>' + a + '</span><b style="color:var(--royal)">' + b + '</b></div>';
   return '<div style="margin-top:12px">' + row('Fazer o diagnóstico', '+50') + row('Concluir um dia', '+100') + row('Cada item do checklist', '+10') + row('Registrar o dia (2 linhas ou mais)', '+20') + row('Responder as 3 perguntas do dia 6', '+30') + '</div>' +
-    '<h3 style="margin-top:16px">Para que servem</h3><ul style="margin:8px 0 0 18px;line-height:1.7" class="muted"><li><b>Mostram o seu nível de líder</b>: Chefe em transição (0) → Líder em formação (200) → Líder consciente (450) → Smart Líder (750).</li><li><b>Premiam a prática real</b>, e não só a leitura: quem cumpre o checklist e registra o dia sobe mais rápido.</li><li><b>A 🔥 sequência</b> conta quantos dias seguidos você concluiu. Constância é o que transforma ação em hábito.</li></ul><p class="small muted" style="margin-top:10px">Os pontos são só seus e ficam no seu aparelho. Eles não alteram o seu perfil de liderança, que é desenhado pelas suas autoavaliações.</p>';
+    '<h3 style="margin-top:16px">Para que servem</h3><ul style="margin:8px 0 0 18px;line-height:1.7" class="muted"><li><b>Mostram o seu nível de líder</b>: Chefe em transição (0) → Líder em formação (200) → Líder consciente (450) → Smart Líder (750).</li><li><b>Premiam a prática real</b>, e não só a leitura: quem cumpre o checklist e registra o dia sobe mais rápido.</li><li><b>A 🔥 sequência</b> conta quantos dias seguidos você concluiu. Constância é o que transforma ação em hábito.</li></ul><p class="small muted" style="margin-top:10px">Os Pontos de Liderança são só seus e ficam no seu aparelho. Eles não alteram o seu perfil de liderança, que é desenhado pelas suas autoavaliações.</p>';
 }
 let sim = { int: 60, com: 45, rel: 82, imp: 38, pa: 6 };
 function viewGuide() {
@@ -589,7 +589,7 @@ function viewGuide() {
       step(3, 'No fim do dia, 5 minutos: marque o checklist e se avalie', 'Notas de 1 a 5 em 4 frases. São elas que desenham o seu formato.') +
       step(4, 'Registre em 2 linhas o que aconteceu', 'Escrever fixa o aprendizado e vale +20 pontos.') +
       '<p class="small muted" style="margin-top:14px">💡 Você pode sair a qualquer momento: o app guarda o ponto onde você parou. Cada dia concluído libera o próximo.</p></div>' +
-    '<div class="card"><h3>⚡ Pontos, níveis e sequência</h3><p class="muted small" style="margin-top:4px">Os números no topo da tela (⚡ e 🔥) <b>não são créditos</b> e não custam nada. São pontos que você ganha praticando.</p>' + ptsTable() + '<p class="small" style="margin-top:10px"><b>Exemplo:</b> a Carla fez o diagnóstico (+50) e o dia 1 completo: 100 + 3 itens do checklist (30) + registro (20). Ela terminou o primeiro dia com 200 pontos e já virou <b>Líder em formação</b>.</p></div>' +
+    '<div class="card"><h3>⚡ Pontos de Liderança, níveis e sequência</h3><p class="muted small" style="margin-top:4px">Os números no topo da tela (⚡ e 🔥) <b>não são créditos</b> e não custam nada. São Pontos de Liderança, que você ganha praticando.</p>' + ptsTable() + '<p class="small" style="margin-top:10px"><b>Exemplo:</b> a Carla fez o diagnóstico (+50) e o dia 1 completo: 100 + 3 itens do checklist (30) + registro (20). Ela terminou o primeiro dia com 200 pontos e já virou <b>Líder em formação</b>.</p></div>' +
     '<div class="card"><h3>🎮 Simulação: como o seu formato se desenha</h3><p class="muted small" style="margin-top:4px">Mexa nos controles para ver como cada estilo muda a forma. No desafio, quem mexe nesses controles são as suas notas dos dias 1 a 4, não um palpite.</p><div id="simRadar" style="margin-top:8px"></div>' +
       KEYS.map(k => '<div style="margin-top:10px"><div class="row between small"><b style="color:' + STY[k].color + '">' + STY[k].short + ' · ' + STY[k].verb + '</b><span id="simv-' + k + '">' + sim[k] + '%</span></div><input type="range" min="10" max="100" value="' + sim[k] + '" data-field="sim" data-k="' + k + '" style="width:100%;accent-color:' + STY[k].color + '"></div>').join('') +
       '<div id="simText" class="card action" style="margin-top:14px"></div></div>' +
@@ -688,7 +688,7 @@ const ACT = {
   beliefPick(el) { const s = D(6); s.pick = +el.dataset.i; save(); render(); },
   useSuggest() { const s = D(6); s.r3 = BELIEFS[s.pick].n; save(); render(); },
   planPick(el) { const s = D(7); s.plan = s.plan || []; const t = el.dataset.t; const k = s.plan.indexOf(t); if (k >= 0) s.plan.splice(k, 1); else { if (s.plan.length >= 3) return toast('Escolha no máximo 3'); s.plan.push(t); } save(); vibrate(10); render(); },
-  ptsInfo() { modal('<h2>⚡ Seus pontos e 🔥 sequência</h2><p class="muted" style="margin-top:8px">Os pontos medem a sua <b>prática</b> no desafio. Não são créditos e não custam nada: você ganha fazendo.</p>' + ptsTable() + '<button class="btn btn-gold btn-block" style="margin-top:16px" data-close>Entendi</button><button class="btn btn-ghost btn-block" style="margin-top:8px" data-close data-go="guide">Ver o guia completo</button>'); },
+  ptsInfo() { modal('<h2>⚡ Seus Pontos de Liderança e 🔥 sequência</h2><p class="muted" style="margin-top:8px">Os Pontos de Liderança medem a sua <b>prática</b> no desafio. Não são créditos e não custam nada: você ganha fazendo.</p>' + ptsTable() + '<button class="btn btn-gold btn-block" style="margin-top:16px" data-close>Entendi</button><button class="btn btn-ghost btn-block" style="margin-top:8px" data-close data-go="guide">Ver o guia completo</button>'); },
   copyPost(el) { copy(posts()[+el.dataset.i].text); award('card'); },
   waPost(el) { openWA(posts()[+el.dataset.i].text); award('card'); },
   liPost(el) { copy(posts()[+el.dataset.i].text); award('card'); toast('Texto copiado. Cole no LinkedIn ✅'); setTimeout(() => window.open('https://www.linkedin.com/feed/?shareActive=true', '_blank', 'noopener'), 400); },
@@ -712,7 +712,7 @@ const ACT = {
   },
   openOut() { window.open(location.origin + location.pathname, '_blank', 'noopener'); },
   hideInstall() { S.hideInstall = true; save(); render(); },
-  restartWeek() { modal('<h2>Começar uma nova semana?</h2><p class="muted" style="margin-top:8px">Seus pontos, conquistas e diagnóstico ficam. Os 7 dias recomeçam para você treinar de novo e ver o seu formato evoluir.</p><button class="btn btn-gold btn-block" style="margin-top:16px" data-act="doRestartWeek" data-close>Sim, nova semana</button><button class="btn btn-ghost btn-block" style="margin-top:8px" data-close>Cancelar</button>'); },
+  restartWeek() { modal('<h2>Começar uma nova semana?</h2><p class="muted" style="margin-top:8px">Seus Pontos de Liderança, conquistas e diagnóstico ficam. Os 7 dias recomeçam para você treinar de novo e ver o seu formato evoluir.</p><button class="btn btn-gold btn-block" style="margin-top:16px" data-act="doRestartWeek" data-close>Sim, nova semana</button><button class="btn btn-ghost btn-block" style="margin-top:8px" data-close>Cancelar</button>'); },
   doRestartWeek() { S.history = S.history || []; S.history.push({ at: Date.now(), scores: scores(), pa: paScore() }); S.days = {}; save(); sync(); go('home'); },
   editMe() { const m = modal('<h2>Meus dados</h2><label class="f">Nome</label><input type="text" id="meName" maxlength="60" value="' + esc(S.user.name) + '"><label class="f">Cargo</label><input type="text" id="meRole" maxlength="60" value="' + esc(S.user.role) + '"><button class="btn btn-gold btn-block" style="margin-top:16px" data-act="saveMe">Salvar</button>'); },
   saveMe() { const n = ($('#meName').value || '').trim(); if (n) S.user.name = n; S.user.role = ($('#meRole').value || '').trim(); save(); sync(); document.querySelector('.modal').remove(); render(); toast('Salvo ✅'); },
